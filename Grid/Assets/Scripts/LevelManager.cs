@@ -5,11 +5,11 @@ using UnityEngine.UI;
 
 public class LevelManager : MonoBehaviour
 {
-    [SerializeField] private LetterInstance _letterPrefab;
+    [SerializeField] private BasicPooler _pooler;
+    [SerializeField] private GameData _gameData;
     [SerializeField] private RectTransform _gameField;
     [SerializeField] private Text _inputHeight;
     [SerializeField] private Text _inputWidth;        
-    [SerializeField] private float _flyTime = 2f;
 
     private List<LetterInstance> letterInstances = new List<LetterInstance>();
     private float _parsedWidth, _parsedHeight;
@@ -30,7 +30,7 @@ public class LevelManager : MonoBehaviour
         {
             for (int j = 0; j < _parsedWidth; j++)
             {
-                LetterInstance _created = Instantiate(_letterPrefab);
+                LetterInstance _created = _pooler.NextLetter();
                 letterInstances.Add(_created);
                 _created.transform.SetParent(_gameField);
                 _created.SetPosition(CalcLetterPosition(j, i), _size);
@@ -58,10 +58,10 @@ public class LevelManager : MonoBehaviour
 
         foreach (LetterInstance letter in letterInstances)
         {
-            letter.StartMove(_flyTime);
+            letter.StartMove(_gameData.flyTime);
         }
 
-        mixedLetters?.Invoke(_flyTime);
+        mixedLetters?.Invoke(_gameData.flyTime);
         
     }
 
@@ -75,7 +75,7 @@ public class LevelManager : MonoBehaviour
     {
         foreach (LetterInstance letter in letterInstances)
         {
-            Destroy(letter.gameObject);
+            letter.gameObject.SetActive(false);
         }
         letterInstances.Clear();
     }
